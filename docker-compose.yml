@@ -1,0 +1,169 @@
+version: '2'
+
+services:
+  workspace:
+    image: busybox:latest
+    volumes:
+      - ${APPLICATION}:/var/www
+      - ./mount/mariadb:/var/lib/mysql:rw
+      - ./mount/redis:/data:rw
+      - ./mount/mongo:/data/db
+      - ./mount/elastic:/usr/share/elasticsearch/data
+
+  php-fpm:
+    build:
+      context: ./services/php
+      args:
+        XDEBUG_ON: ${XDEBUG_ON}
+        XDEBUG_REMOTE_HOST: ${XDEBUG_REMOTE_HOST}
+    ports:
+      - 9000
+    volumes:
+      - ./services/php/php.ini:/usr/local/etc/php/php.ini:ro
+      - ./services/php/php-fpm.conf:/usr/local/etc/php-fpm.conf:ro
+      - ./services/php/www.conf:/usr/local/etc/php-fpm.d/www.conf:ro
+    volumes_from:
+      - workspace
+    restart: always
+    environment:
+      USER: ${USER}
+    extra_hosts:
+       - "symfony.fiddle.local:10.5.0.5"
+       - "drupal.fiddle.local:10.5.0.5"
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.4
+
+  nginx:
+    build:
+      context: ./services/nginx
+    volumes:
+      - ./services/nginx/logs:/var/log/nginx
+      - ./services/nginx/sites:/etc/nginx/conf.d
+    volumes_from:
+      - workspace
+    ports:
+      - 80:80
+      - 443:443
+    depends_on:
+      - php-fpm
+    restart: always
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.5
+
+  mariadb:
+    build:
+      context: ./services/mariadb
+    ports:
+      - 3306:3306
+    volumes_from:
+      - workspace
+    environment:
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: secret
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.6
+
+  redis:
+    build:
+      context: ./services/redis
+    volumes_from:
+      - workspace
+    ports:
+      - 6379:6379
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.7
+
+  mongo:
+    build:
+      context: ./services/mongo
+    ports:
+      - 27017:27017
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.8
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: flaskdb
+      MONGODB_DATA_DIR: /data/db
+      MONDODB_LOG_DIR: /dev/null
+    volumes:
+      - mongodbdata:/data/db
+
+  elasticsearch:
+    build:
+      context: ./services/elasticsearch
+    volumes:
+      - ./services/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+    volumes_from:
+      - workspace
+    environment:
+      USER: ${USER}
+      ES_JAVA_OPTS: "-Xmx256m -Xms256m"
+    ports:
+      - 9200:9200
+      - 9300:9300
+    networks:
+      vpcbr:
+        ipv4_address: 10.5.0.9
+
+  node:
+    build:
+      context: ./services/node
+    volumes_from:
+      - workspace
+
+  dejavu:
+    build:
+      context: ./services/dejavu
+    volumes_from:
+      - workspace
+    ports:
+      - 1358:1358
+
+volumes:
+  php-fpm:
+    driver: local
+  nginx:
+    driver: local
+  mariadb:
+    driver: local
+  redis:
+    driver: local
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/16
+         gateway: 10.5.0.1
+
+flask:
+  build:
+    context: app
+    dockerfile: Dockerfile
+  container_name: flask
+  image: digitalocean.com/flask-python:3.6
+  restart: unless-stopped
+  environment:
+    APP_ENV: "prod"
+    APP_DEBUG: "False"
+    APP_PORT: 5000
+    MONGODB_DATABASE: flaskdb
+    MONGODB_USERNAME: root
+    MONGODB_PASSWORD: secret
+    MONGODB_HOSTNAME: 10.5.0.8
+  volumes:
+    - appdata:/var/www
+  depends_on:
+    - mongodb
+  networks:
+    - frontend
+    - backend
