@@ -2,7 +2,7 @@
 
 # Elementary VM
 
-This is the future. This is `innovation`
+"This is the future. This is `innovation`" - Alex Tenepere
 
 ### Why work on a VM
 
@@ -35,7 +35,7 @@ This is the future. This is `innovation`
 
 ## Setup Guide
 
-* Copy the `Elementary OS` folder from here `\\ph.esl-asia.com\shares\IT\elementary` to your local filesystem
+* Copy the `Elementary OS` folder from here `<to be created>` to your local filesystem
 * Open VMware and click `Open existing machine`
 * Point to the `vmdk` file
 * Run the machine
@@ -45,7 +45,7 @@ This is the future. This is `innovation`
 ## Post Setup
 
 * Setup your SSH key for our Gitlab. It is recommended to setup a new SSH key for your local VM and put it on Gitlab
-* Checkout the [Docker Lemp Stack](https://gitlab.ph.esl-asia.com/CMS/docker-lemp-stack) and start it
+* Checkout the [Docker Lemp Stack](https://github.com/rainercedric23/docker-lemp-stack) and start it
 * You can now start migrating your repositories
 
 ## Setup Verification Guide
@@ -54,7 +54,7 @@ This is the future. This is `innovation`
 
 1. Check if VM can accomodate full monitor resolution
 2. Add new SSH key to Gitlab
-3. Git clone that master branch of https://gitlab.ph.esl-asia.com/CMS/docker-lemp-stack, `please read extensively the docker stack setup guide`
+3. Git clone that master branch of https://github.com/rainercedric23/docker-lemp-stack, `please read extensively the docker stack setup guide`
 4. Run the docker using the start command
 5. Check if you can access `laravel.dev` on your VM chrome
 
