@@ -76,4 +76,4 @@ API layer.
 
 * Destroy then initialize the machine
 * If it does not solve your problem, Restart your PC 3 times
-* If problems persist, fix it, or consult me (Alex)
+* If problems persist, fix it, or raise an issue on git
