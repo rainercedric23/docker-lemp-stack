@@ -39,11 +39,11 @@ settings, then you need to reload it.
 * `./bin/reload nginx` Recreates nginx instance
 * `./bin/reload <service_name>` Recreates any service instance
 
-# Notes for Webcomposer
+# Notes for stack websites
 
 Please check `docker-compose.yml` on the php-fpm extra host section. You might
-need to adjust your extra hosts to match your custom host file for Drupal and
-API layer.
+need to adjust your extra hosts to match your custom host file for Drupal,
+API layer and other sites that connect internally.
 
 # FAQ
 
