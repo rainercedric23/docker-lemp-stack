@@ -1,7 +1,6 @@
 # Docker Lemp Stack
 
 Is Windows slowing you down ? Well this Docker stack won't.
-`This does not work on Windows`
 
 [How to run your own Elementary Workstation](docs/elementary.md)
 
