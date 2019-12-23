@@ -2,8 +2,6 @@
 
 Is Windows slowing you down ? Well this Docker stack won't.
 
-[How to run your own Elementary Workstation](docs/elementary.md)
-
 # Features
 
 * `Nginx` with exposed awesome vhost support
